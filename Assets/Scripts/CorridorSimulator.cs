@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,14 +13,14 @@ public class CorridorSimulator : MonoBehaviour
     [SerializeField]
     private int _angle = 0;
     [SerializeField]
-    private int _moveStep = 100;
+    private int _moveStep = 1;
     [SerializeField]
     private int _rotateStep = 45;
     [SerializeField]
     private Image _currentView;
 
     private Dictionary<string, Sprite> _spritesDatabase;
-    private Vector2 _currentDirection = Vector2.up;
+    private Vector2 _currentDirection = Vector2.right;
 
     void Start()
     {
@@ -33,11 +34,17 @@ public class CorridorSimulator : MonoBehaviour
         // Движение вперед/назад
         if (Input.GetKeyUp(KeyCode.UpArrow))
         {
-            Move(1);
+            if (CanMove(1))
+            {
+                Move(1);
+            }
         }
         else if (Input.GetKeyUp(KeyCode.DownArrow))
         {
-            Move(-1);
+            if (CanMove(-1))
+            {
+                Move(-1); 
+            }
         }
 
         // Поворот
@@ -100,7 +107,7 @@ public class CorridorSimulator : MonoBehaviour
         }
 
         float radians = _angle * Mathf.Deg2Rad;
-        _currentDirection = new Vector2(Mathf.Sin(radians), Mathf.Cos(radians));
+        _currentDirection = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
 
         UpdateView();
     }
@@ -132,6 +139,15 @@ public class CorridorSimulator : MonoBehaviour
         int newX = _posX + Mathf.RoundToInt(_currentDirection.x) * _moveStep * direction;
         int newY = _posY + Mathf.RoundToInt(_currentDirection.y) * _moveStep * direction;
 
-        return _spritesDatabase.ContainsKey($"posX{newX}_Y{newY}_angle{_angle}");
+        return _spritesDatabase.ContainsKey($"posX{newX}_Y{newY}_{_angle}");
+    }
+
+    public void OnExitButtonClick()
+    {
+#if UNITY_EDITOR
+        EditorApplication.ExitPlaymode();
+#else
+        Application.Quit();
+#endif
     }
 }
