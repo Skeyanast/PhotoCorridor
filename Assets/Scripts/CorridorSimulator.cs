@@ -15,7 +15,7 @@ public class CorridorSimulator : MonoBehaviour
     [SerializeField]
     private int _moveStep = 1;
     [SerializeField]
-    private int _rotateStep = 45;
+    private int _rotateStep = 90;
     [SerializeField]
     private Image _currentView;
 
