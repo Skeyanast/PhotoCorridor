@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2ccbcca426ca7694195f4c329fde90f8
+guid: 9e8182034c7517046ab8859245d9013f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4200683297322474804
-    second: posX1_Y0_angle180_0
+      213: 1383977110342348870
+    second: posX3_Y0_angle90_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: posX1_Y0_angle180_0
+      name: posX3_Y0_angle90_0
       rect:
         serializedVersion: 2
         x: 0
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: cc26d291ccc24b5c0800000000000000
-      internalID: -4200683297322474804
+      spriteID: 6403a3769dfd43310800000000000000
+      internalID: 1383977110342348870
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      posX1_Y0_angle180_0: -4200683297322474804
+      posX3_Y0_angle90_0: 1383977110342348870
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
