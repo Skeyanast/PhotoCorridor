@@ -18,15 +18,24 @@ public class CorridorSimulator : MonoBehaviour
     private int _rotateStep = 90;
     [SerializeField]
     private Image _currentView;
+    [SerializeField]
+    private Vector2 _stathemPointA = new(4, 0);
+    [SerializeField]
+    private Vector2 _stathemPointB = new(0, 0);
+    [SerializeField]
+    private float _stathemStepDelay = 2f;
 
+    private Vector2 _stathemCoords;
     private Dictionary<string, Sprite> _spritesDatabase;
     private Vector2 _currentDirection = Vector2.right;
 
     void Start()
     {
+        _stathemCoords = _stathemPointA;
         _spritesDatabase = new Dictionary<string, Sprite>();
         LoadAllSprites();
         UpdateView();
+        StartCoroutine(StathemMovement());
     }
 
     void Update()
@@ -149,5 +158,16 @@ public class CorridorSimulator : MonoBehaviour
 #else
         Application.Quit();
 #endif
+    }
+
+    private IEnumerator StathemMovement()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(_stathemStepDelay);
+
+            _stathemCoords = (_stathemCoords == _stathemPointA) ? _stathemPointB : _stathemPointA;
+            Debug.Log($"Текущая точка: {_stathemCoords}");
+        }
     }
 }
