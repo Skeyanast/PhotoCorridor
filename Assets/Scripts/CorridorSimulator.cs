@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -7,9 +8,7 @@ using UnityEngine.UI;
 public class CorridorSimulator : MonoBehaviour
 {
     [SerializeField]
-    private int _posX = 0;
-    [SerializeField]
-    private int _posY = 0;
+    private Vector2 _position = new();
     [SerializeField]
     private int _angle = 0;
     [SerializeField]
@@ -24,17 +23,27 @@ public class CorridorSimulator : MonoBehaviour
     private Vector2 _stathemPointB = new(0, 0);
     [SerializeField]
     private float _stathemStepDelay = 2f;
+    [SerializeField]
+    private Image _stathemImage;
+    [SerializeField]
+    private Sprite _stathemFaceSprite;
+    [SerializeField]
+    private Sprite _stathemBackSprite;
+
 
     private Vector2 _stathemCoords;
+    private Vector2 _stathemTargetPoint;
     private Dictionary<string, Sprite> _spritesDatabase;
     private Vector2 _currentDirection = Vector2.right;
 
     void Start()
     {
         _stathemCoords = _stathemPointA;
+        _stathemTargetPoint = _stathemPointB;
         _spritesDatabase = new Dictionary<string, Sprite>();
         LoadAllSprites();
         UpdateView();
+        SetStathem();
         StartCoroutine(StathemMovement());
     }
 
@@ -65,6 +74,8 @@ public class CorridorSimulator : MonoBehaviour
         {
             Rotate(1);
         }
+
+        UpdateStathem();
     }
 
     private void LoadAllSprites()
@@ -95,8 +106,8 @@ public class CorridorSimulator : MonoBehaviour
 
     private void Move(int direction)
     {
-        _posX += Mathf.RoundToInt(_currentDirection.x) * _moveStep * direction;
-        _posY += Mathf.RoundToInt(_currentDirection.y) * _moveStep * direction;
+        _position.x += Mathf.RoundToInt(_currentDirection.x) * _moveStep * direction;
+        _position.y += Mathf.RoundToInt(_currentDirection.y) * _moveStep * direction;
 
         UpdateView();
     }
@@ -123,7 +134,7 @@ public class CorridorSimulator : MonoBehaviour
 
     private void UpdateView()
     {
-        string key = $"posX{_posX}_Y{_posY}_{_angle}";
+        string key = $"posX{_position.x}_Y{_position.y}_{_angle}";
 
         if (_spritesDatabase.TryGetValue(key, out Sprite newSprite))
         {
@@ -145,8 +156,8 @@ public class CorridorSimulator : MonoBehaviour
 
     private bool CanMove(int direction)
     {
-        int newX = _posX + Mathf.RoundToInt(_currentDirection.x) * _moveStep * direction;
-        int newY = _posY + Mathf.RoundToInt(_currentDirection.y) * _moveStep * direction;
+        int newX = Convert.ToInt32(_position.x) + Mathf.RoundToInt(_currentDirection.x) * _moveStep * direction;
+        int newY = Convert.ToInt32(_position.y) + Mathf.RoundToInt(_currentDirection.y) * _moveStep * direction;
 
         return _spritesDatabase.ContainsKey($"posX{newX}_Y{newY}_{_angle}");
     }
@@ -166,8 +177,54 @@ public class CorridorSimulator : MonoBehaviour
         {
             yield return new WaitForSeconds(_stathemStepDelay);
 
-            _stathemCoords = (_stathemCoords == _stathemPointA) ? _stathemPointB : _stathemPointA;
-            Debug.Log($"Текущая точка: {_stathemCoords}");
+            Vector2 direction = (_stathemTargetPoint - _stathemCoords).normalized;
+            _stathemCoords += direction;
+
+            if (_stathemCoords == _stathemPointA)
+            {
+                _stathemTargetPoint = _stathemPointB;
+            }
+            else if (_stathemCoords == _stathemPointB)
+            {
+                _stathemTargetPoint = _stathemPointA;
+            }
+
+            Debug.Log($"Текущая конечная точка: {_stathemTargetPoint}\n Координаты: {_stathemCoords}\n Направление: {direction}");
         }
+    }
+
+    private int StathemDistance()
+    {
+        return Mathf.RoundToInt((_stathemCoords - _position).magnitude);
+    }
+
+    private float StathemSpriteScale()
+    {
+        int distance = StathemDistance();
+        return distance switch
+        {
+            0 => 20,
+            1 => 4.5f,
+            2 => 2f,
+            3 => 1.4f,
+            4 => 1f,
+            _ => throw new Exception("Куда-то ушел"),
+        };
+    }
+
+    private void SetStathem()
+    {
+        _stathemImage.preserveAspect = true;
+        _stathemImage.rectTransform.anchoredPosition = Vector2.zero;
+        _stathemImage.rectTransform.sizeDelta = new(100f, 100f);
+        _stathemImage.sprite = _stathemFaceSprite;
+        _stathemImage.enabled = true;
+
+    }
+
+    private void UpdateStathem()
+    {
+        float koeff = StathemSpriteScale();
+        _stathemImage.rectTransform.localScale = new Vector2(1f * koeff, 1f * koeff);
     }
 }
