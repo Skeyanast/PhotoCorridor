@@ -7,41 +7,36 @@ using UnityEngine.UI;
 
 public class CorridorSimulator : MonoBehaviour
 {
-    [SerializeField]
-    private Vector2 _position = new();
-    [SerializeField]
-    private int _angle = 0;
-    [SerializeField]
-    private int _moveStep = 1;
-    [SerializeField]
-    private int _rotateStep = 90;
-    [SerializeField]
-    private Image _currentView;
-    [SerializeField]
-    private Vector2 _stathemPointA = new(4, 0);
-    [SerializeField]
-    private Vector2 _stathemPointB = new(0, 0);
-    [SerializeField]
-    private float _stathemStepDelay = 2f;
-    [SerializeField]
-    private Image _stathemImage;
-    [SerializeField]
-    private Sprite _stathemFaceSprite;
-    [SerializeField]
-    private Sprite _stathemBackSprite;
+    [Header("Player")]
+    [SerializeField] private Vector2 _position = new();
+    [SerializeField] private int _angle = 0;
+    [SerializeField] private int _moveStep = 1;
+    [SerializeField] private int _rotateStep = 90;
 
+    [Header("UI")]
+    [SerializeField] private Image _currentView;
+
+    [Header("Stathem")]
+    [SerializeField] private Vector2 _stathemPointA = new(4, 0);
+    [SerializeField] private Vector2 _stathemPointB = new(0, 0);
+    [SerializeField] private float _stathemStepDelay = 2f;
+
+    [Header("StathemUI")]
+    [SerializeField] private Image _stathemImage;
+    [SerializeField] private Sprite _stathemFaceSprite;
+    [SerializeField] private Sprite _stathemBackSprite;
+
+
+    private Vector2 _currentDirection = Vector2.right;
 
     private Vector2 _stathemCoords;
     private Vector2 _stathemTargetPoint;
-    private Dictionary<string, Sprite> _spritesDatabase;
-    private Vector2 _currentDirection = Vector2.right;
 
     void Start()
     {
         _stathemCoords = _stathemPointA;
         _stathemTargetPoint = _stathemPointB;
-        _spritesDatabase = new Dictionary<string, Sprite>();
-        LoadAllSprites();
+        SpritesDatabase.LoadAllSprites();
         UpdateView();
         SetStathem();
         StartCoroutine(StathemMovement());
@@ -78,32 +73,6 @@ public class CorridorSimulator : MonoBehaviour
         UpdateStathem();
     }
 
-    private void LoadAllSprites()
-    {
-        _spritesDatabase = new Dictionary<string, Sprite>();
-
-        string[] positionFolders = System.IO.Directory.GetDirectories(Application.dataPath + "/Resources/Sprites/");
-
-        foreach (string folderPath in positionFolders)
-        {
-            string folderName = System.IO.Path.GetFileName(folderPath);
-
-            Sprite[] angleSprites = Resources.LoadAll<Sprite>("Sprites/" + folderName);
-
-            foreach (Sprite sprite in angleSprites)
-            {
-                string angleStr = sprite.name.Replace($"{folderName}_angle", "");
-
-                if (int.TryParse(angleStr, out int angleValue))
-                {
-                    // Ключ в словаре: "posX0_Y0_45"
-                    string key = $"{folderName}_{angleValue}";
-                    _spritesDatabase[key] = sprite;
-                }
-            }
-        }
-    }
-
     private void Move(int direction)
     {
         _position.x += Mathf.RoundToInt(_currentDirection.x) * _moveStep * direction;
@@ -132,11 +101,19 @@ public class CorridorSimulator : MonoBehaviour
         UpdateView();
     }
 
+    private bool CanMove(int direction)
+    {
+        int newX = Convert.ToInt32(_position.x) + Mathf.RoundToInt(_currentDirection.x) * _moveStep * direction;
+        int newY = Convert.ToInt32(_position.y) + Mathf.RoundToInt(_currentDirection.y) * _moveStep * direction;
+
+        return SpritesDatabase.Database.ContainsKey($"posX{newX}_Y{newY}_{_angle}");
+    }
+
     private void UpdateView()
     {
         string key = $"posX{_position.x}_Y{_position.y}_{_angle}";
 
-        if (_spritesDatabase.TryGetValue(key, out Sprite newSprite))
+        if (SpritesDatabase.Database.TryGetValue(key, out Sprite newSprite))
         {
             StartCoroutine(SmoothTransition(newSprite));
         }
@@ -152,14 +129,6 @@ public class CorridorSimulator : MonoBehaviour
         _currentView.sprite = newSprite;
         _currentView.preserveAspect = true;
         yield return new WaitForSeconds(0.5f);
-    }
-
-    private bool CanMove(int direction)
-    {
-        int newX = Convert.ToInt32(_position.x) + Mathf.RoundToInt(_currentDirection.x) * _moveStep * direction;
-        int newY = Convert.ToInt32(_position.y) + Mathf.RoundToInt(_currentDirection.y) * _moveStep * direction;
-
-        return _spritesDatabase.ContainsKey($"posX{newX}_Y{newY}_{_angle}");
     }
 
     public void OnExitButtonClick()
