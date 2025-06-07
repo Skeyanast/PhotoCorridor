@@ -1,0 +1,29 @@
+using UnityEngine;
+
+public class StathemMovement : MonoBehaviour
+{
+    [SerializeField] private Vector2 _stathemPointA = new(4, 0);
+    [SerializeField] private Vector2 _stathemPointB = new(0, 0);
+    [SerializeField] private float _stathemStepDelay = 2f;
+
+    private Vector2 _stathemCoords;
+    private Vector2 _stathemTargetPoint;
+
+<<<<<<< HEAD
+    void Start()
+=======
+    private void Start()
+>>>>>>> 1c0d3e13480d44e9049aac6f17f385fe97b3995a
+    {
+        
+    }
+
+<<<<<<< HEAD
+    void Update()
+=======
+    private void Update()
+>>>>>>> 1c0d3e13480d44e9049aac6f17f385fe97b3995a
+    {
+        
+    }
+}
