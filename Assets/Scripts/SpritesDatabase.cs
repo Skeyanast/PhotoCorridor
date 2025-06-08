@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 
 public static class SpritesDatabase
 {
     private static Dictionary<string, Sprite> _database = new();
-
-    public static Dictionary<string, Sprite> Database => _database;
 
     public static void LoadAllSprites()
     {
@@ -33,5 +32,26 @@ public static class SpritesDatabase
                 }
             }
         }
+    }
+
+    public static bool ContainsSprite(Vector2 position, float angle)
+    {
+        string key = CreateDatabaseKey(position, angle);
+
+        return _database.ContainsKey(key);
+    }
+
+    public static bool TryGetSprite(Vector2 position, float angle, out Sprite value)
+    {
+        string key = CreateDatabaseKey(position, angle);
+
+        return _database.TryGetValue(key, out value);
+    }
+
+    private static string CreateDatabaseKey(Vector2 position, float angle)
+    {
+        Func<float, int> processNumber = Mathf.RoundToInt;
+
+        return $"posX{processNumber(position.x)}_Y{processNumber(position.y)}_{processNumber(angle)}";
     }
 }

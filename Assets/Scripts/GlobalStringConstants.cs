@@ -7,8 +7,4 @@ public static class GlobalStringConstants
     public const string CORRIDOR_SPRITES_FOLDER = "Sprites/";
 
     #endregion
-    #region INPUT VARS
-    public const string HORIZONTAL_AXIS = "Horizontal";
-    public const string VERTICAL_AXIS = "Vertical";
-    #endregion
 }
