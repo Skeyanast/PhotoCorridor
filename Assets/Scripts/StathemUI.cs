@@ -7,16 +7,31 @@ public class StathemUI : MonoBehaviour
     [SerializeField] private Sprite _stathemFaceSprite;
     [SerializeField] private Sprite _stathemBackSprite;
     [SerializeField] private AnimationCurve _spriteScaleCurve;
+    [SerializeField] private AnimationCurve _spritePositionCurve;
 
     private void Start()
     {
         InitialSpriteSet();
     }
 
-    public void UpdateSprite(float distance)
+    public void UpdateSprite(float distance, bool visibility)
     {
-        float koeff = SpriteScale(distance);
-        _stathemImage.rectTransform.localScale = new Vector2(1f * koeff, 1f * koeff);
+        float scaleKoeff = SpriteScale(distance);
+        float positionY = SpritePositionY(distance);
+
+        _stathemImage.rectTransform.localScale = new Vector2(1f * scaleKoeff, 1f * scaleKoeff);
+        _stathemImage.rectTransform.anchoredPosition = new Vector3(0f, positionY);
+        _stathemImage.enabled = visibility;
+    }
+
+    public void SetFaceSprite()
+    {
+        _stathemImage.sprite = _stathemFaceSprite;
+    }
+
+    public void SetBackSprite()
+    {
+        _stathemImage.sprite = _stathemBackSprite;
     }
 
     private void InitialSpriteSet()
@@ -31,5 +46,10 @@ public class StathemUI : MonoBehaviour
     private float SpriteScale(float distance)
     {
         return _spriteScaleCurve.Evaluate(distance);
+    }
+
+    private float SpritePositionY(float distance)
+    {
+        return _spritePositionCurve.Evaluate(distance);
     }
 }

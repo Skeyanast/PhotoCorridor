@@ -10,6 +10,8 @@ public class GameUIController : MonoBehaviour
     [SerializeField] private PlayerMovement _player;
     [SerializeField] private StathemMovement _stathem;
 
+    [SerializeField] private float _viewDistance = 4;
+    
     private void Awake()
     {
         SpritesDatabase.LoadAllSprites();
@@ -79,7 +81,28 @@ public class GameUIController : MonoBehaviour
     private void UpdateStathemUI()
     {
         float distance = PlayerStathemDistance();
-        _stathem.UIComponent.UpdateSprite(distance);
+        bool visible = StathemVisible();
+        _stathem.UIComponent.UpdateSprite(distance, visible);
+    }
+
+    private bool StathemVisible()
+    {
+        Vector2 directionToObject = (_stathem.Position - _player.Position).normalized;
+        float angle = Vector2.Angle(_player.CurrentForwardDirection, directionToObject);
+        float distance = Vector2.Distance(_player.Position, _stathem.Position);
+
+        float forwardsAngle = Vector2.Angle(_player.CurrentForwardDirection, _stathem.Direction);
+
+        if (forwardsAngle == 180f)
+        {
+            _stathem.UIComponent.SetFaceSprite();
+        }
+        else if (forwardsAngle == 0f)
+        {
+            _stathem.UIComponent.SetBackSprite();
+        }
+
+        return angle == 0 && distance <= _viewDistance;
     }
 
     private int PlayerStathemDistance()
